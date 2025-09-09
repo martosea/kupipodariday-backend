@@ -26,7 +26,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  async getOwn(@GetUserId() id: number): Promise<any> {
+  async getOwn(@GetUserId() id: number): Promise<unknown> {
     return this.usersService.findById(id);
   }
 
@@ -36,28 +36,32 @@ export class UsersController {
   async updateCurrentUser(
     @GetUserId() id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Get('me/wishes')
-  async getOwnWishes(@GetUserId() id: number): Promise<any> {
+  async getOwnWishes(@GetUserId() id: number): Promise<unknown[]> {
     return this.usersService.getOwnWishes(id);
   }
 
   @Get(':username')
-  async getUserByUsername(@Param('username') username: string): Promise<any> {
+  async getUserByUsername(
+    @Param('username') username: string,
+  ): Promise<unknown> {
     return this.usersService.findOne(username);
   }
 
   @Get(':username/wishes')
-  async getWishesByUsername(@Param('username') username: string): Promise<any> {
+  async getWishesByUsername(
+    @Param('username') username: string,
+  ): Promise<unknown[]> {
     return this.usersService.findWishes(username);
   }
 
   @Post('find')
   @HttpCode(HttpStatus.OK)
-  async findUsers(@Body() dto: FindUserDto): Promise<any> {
+  async findUsers(@Body() dto: FindUserDto): Promise<unknown[]> {
     return this.usersService.findMany(dto);
   }
 }

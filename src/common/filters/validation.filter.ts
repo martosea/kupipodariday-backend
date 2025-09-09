@@ -12,7 +12,9 @@ export class ValidationFilter implements ExceptionFilter<BadRequestException> {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const errorResponse: any = exception.getResponse();
+    const errorResponse = exception.getResponse() as
+      | string
+      | { message: string | string[]; error: string; statusCode: number };
 
     response.status(exception.getStatus()).json({
       message: 'Ошибка валидации',

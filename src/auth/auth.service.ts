@@ -19,7 +19,10 @@ export class AuthService {
       throw new UnauthorizedException('Username or password is invalid');
     }
 
-    const isMatch = await this.hashService.verifyPassword(password, user.password);
+    const isMatch = await this.hashService.verifyPassword(
+      password,
+      user.password,
+    );
     if (!isMatch) {
       throw new UnauthorizedException('Username or password is invalid');
     }

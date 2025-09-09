@@ -20,7 +20,10 @@ export class WishlistsService {
     private readonly wishesService: WishesService,
   ) {}
 
-  async create(createWishlistDto: CreateWishlistDto, user: User): Promise<any> {
+  async create(
+    createWishlistDto: CreateWishlistDto,
+    user: User,
+  ): Promise<unknown> {
     const { itemsId, ...rest } = createWishlistDto;
     const items = await this.wishesService.getManyByIds(itemsId);
     const wishlist = await this.wishlistRepository.save({
@@ -41,14 +44,14 @@ export class WishlistsService {
     return fullWishlist.toJSON();
   }
 
-  async getWishLists(): Promise<any[]> {
+  async getWishLists(): Promise<unknown[]> {
     const wishlists = await this.wishlistRepository.find({
       relations: ['owner', 'items'],
     });
     return wishlists.map((wishlist) => wishlist.toJSON());
   }
 
-  async findById(id: number): Promise<any> {
+  async findById(id: number): Promise<unknown> {
     const wishlist = await this.wishlistRepository.findOne({
       where: { id },
       relations: ['owner', 'items'],
@@ -65,7 +68,7 @@ export class WishlistsService {
     id: number,
     updateWishlistDto: UpdateWishlistDto,
     userId: number,
-  ): Promise<any> {
+  ): Promise<unknown> {
     const entity = await this.wishlistRepository.findOne({
       where: { id },
       relations: ['owner', 'items'],
@@ -93,7 +96,7 @@ export class WishlistsService {
     return this.findById(id);
   }
 
-  async remove(wishlistId: number, userId: number): Promise<any> {
+  async remove(wishlistId: number, userId: number): Promise<unknown> {
     const wishlist = await this.wishlistRepository.findOne({
       where: { id: wishlistId },
       relations: ['owner'],

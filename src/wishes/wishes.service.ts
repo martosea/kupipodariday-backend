@@ -3,13 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateWishDto } from './dto/create-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Wish } from './entities/wish.entity';
 import { DataSource, In, Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
-import { WishErrors, WishesLimits } from './wishes.constants';
+
+import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
+import { Wish } from './entities/wish.entity';
+import { WishErrors, WishesLimits } from './wishes.constants';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class WishesService {
@@ -19,11 +20,11 @@ export class WishesService {
     private readonly dataSource: DataSource,
   ) {}
 
-  create(createWishDto: CreateWishDto, user: User): Promise<any> {
+  create(createWishDto: CreateWishDto, user: User): Promise<unknown> {
     return this.wishRepository.save({ ...createWishDto, owner: user });
   }
 
-  async findById(id: number): Promise<any> {
+  async findById(id: number): Promise<unknown> {
     const wish = await this.wishRepository.findOne({
       where: { id },
       relations: ['owner', 'offers', 'offers.user'],
@@ -36,27 +37,31 @@ export class WishesService {
     return wish.toJSON();
   }
 
-  async findLatestWishes(): Promise<any[]> {
+  async findLatestWishes(): Promise<unknown[]> {
     const wishes = await this.wishRepository.find({
       order: { createdAt: 'DESC' },
       take: WishesLimits.latest,
       relations: ['owner'],
     });
 
-    return wishes.map((wish) => wish.toJSON()) ?? [];
+    return wishes.map((wish) => wish.toJSON());
   }
 
-  async findTopWishes(): Promise<any[]> {
+  async findTopWishes(): Promise<unknown[]> {
     const wishes = await this.wishRepository.find({
       order: { copied: 'DESC' },
       take: WishesLimits.mostCopied,
       relations: ['owner'],
     });
 
-    return wishes.map((wish) => wish.toJSON()) ?? [];
+    return wishes.map((wish) => wish.toJSON());
   }
 
-  async update(wishId: number, updateWishDto: UpdateWishDto, userId: number): Promise<any> {
+  async update(
+    wishId: number,
+    updateWishDto: UpdateWishDto,
+    userId: number,
+  ): Promise<unknown> {
     const wish = await this.wishRepository.findOne({
       where: { id: wishId },
       relations: ['owner'],
@@ -88,7 +93,7 @@ export class WishesService {
     return updatedWish.toJSON();
   }
 
-  async remove(wishId: number, userId: number): Promise<any> {
+  async remove(wishId: number, userId: number): Promise<unknown> {
     const wish = await this.wishRepository.findOne({
       where: { id: wishId },
       relations: ['owner'],
@@ -106,7 +111,7 @@ export class WishesService {
     return wish.toJSON();
   }
 
-  async copy(wishId: number, user: User): Promise<any> {
+  async copy(wishId: number, user: User): Promise<unknown> {
     const originalWish = await this.wishRepository.findOne({
       where: { id: wishId },
       relations: ['owner'],
@@ -134,9 +139,12 @@ export class WishesService {
 
       await wishRepo.update(wishId, { copied: fresh.copied + 1 });
 
-      const { id, createdAt, updatedAt, copied, owner, offers, raised, ...wishData } = fresh as any;
       const newWish = await wishRepo.save({
-        ...wishData,
+        name: fresh.name,
+        link: fresh.link,
+        image: fresh.image,
+        price: fresh.price,
+        description: fresh.description,
         owner: user,
         raised: 0,
         copied: 0,
@@ -161,7 +169,7 @@ export class WishesService {
     }
   }
 
-  async getManyByIds(wishIds: number[]): Promise<any[]> {
+  async getManyByIds(wishIds: number[]): Promise<unknown[]> {
     if (!wishIds.length) return [];
     const wishes = await this.wishRepository.find({
       where: { id: In(wishIds) },
@@ -170,7 +178,7 @@ export class WishesService {
     return wishes.map((wish) => wish.toJSON());
   }
 
-  async updateRaised(id: number, raisedAmount: number): Promise<any> {
+  async updateRaised(id: number, raisedAmount: number): Promise<unknown> {
     await this.wishRepository.update(id, { raised: raisedAmount });
     const updatedWish = await this.wishRepository.findOneBy({ id });
     if (!updatedWish) {

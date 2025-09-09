@@ -18,8 +18,10 @@ export abstract class CommonEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  toJSON() {
-    const obj: any = { ...this };
+  toJSON(): Record<string, unknown> {
+    const obj: Record<string, unknown> = {
+      ...(this as Record<string, unknown>),
+    };
 
     if (this.createdAt instanceof Date) {
       obj.createdAt = this.createdAt.toISOString();
@@ -30,14 +32,19 @@ export abstract class CommonEntity {
 
     for (const [key, val] of Object.entries(obj)) {
       if (val && typeof val === 'object') {
-        if (typeof (val as any).toJSON === 'function') {
-          obj[key] = (val as any).toJSON();
+        const maybeWithToJSON = val as { toJSON?: () => unknown };
+        if (typeof maybeWithToJSON.toJSON === 'function') {
+          obj[key] = maybeWithToJSON.toJSON();
         } else if (Array.isArray(val)) {
-          obj[key] = val.map((el) =>
-            el && typeof el === 'object' && typeof (el as any).toJSON === 'function'
-              ? (el as any).toJSON()
-              : el,
-          );
+          obj[key] = val.map((el) => {
+            if (el && typeof el === 'object') {
+              const elWithToJSON = el as { toJSON?: () => unknown };
+              return typeof elWithToJSON.toJSON === 'function'
+                ? elWithToJSON.toJSON()
+                : el;
+            }
+            return el;
+          });
         }
       }
     }

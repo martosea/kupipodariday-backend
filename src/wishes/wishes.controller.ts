@@ -33,26 +33,26 @@ export class WishesController {
   async create(
     @GetUser() user: User,
     @Body() createWishDto: CreateWishDto,
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.wishesService.create(createWishDto, user);
   }
 
   @UseInterceptors(PasswordInterceptor)
   @Get('last')
-  async findLatestWishes(): Promise<any> {
+  async findLatestWishes(): Promise<unknown[]> {
     return this.wishesService.findLatestWishes();
   }
 
   @UseInterceptors(PasswordInterceptor)
   @Get('top')
-  async findTopWishes(): Promise<any> {
+  async findTopWishes(): Promise<unknown[]> {
     return this.wishesService.findTopWishes();
   }
 
   @UseInterceptors(PasswordInterceptor, OfferInterceptor)
   @UseGuards(AuthGuardJwt)
   @Get(':id')
-  async findWish(@Param('id', ParseIntPipe) id: number): Promise<any> {
+  async findWish(@Param('id', ParseIntPipe) id: number): Promise<unknown> {
     return this.wishesService.findById(id);
   }
 
@@ -64,7 +64,7 @@ export class WishesController {
     @Param('id', ParseIntPipe) wishId: number,
     @Body() updateWishDto: UpdateWishDto,
     @GetUserId() userId: number,
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.wishesService.update(wishId, updateWishDto, userId);
   }
 
@@ -74,7 +74,7 @@ export class WishesController {
   async remove(
     @Param('id', ParseIntPipe) wishId: number,
     @GetUserId() userId: number,
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.wishesService.remove(wishId, userId);
   }
 
@@ -84,7 +84,7 @@ export class WishesController {
   async copy(
     @Param('id', ParseIntPipe) wishId: number,
     @GetUser() user: User,
-  ): Promise<any> {
+  ): Promise<unknown> {
     return this.wishesService.copy(wishId, user);
   }
 }

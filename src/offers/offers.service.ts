@@ -20,7 +20,7 @@ export class OffersService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createOfferDto: CreateOfferDto, user: User): Promise<any> {
+  async create(createOfferDto: CreateOfferDto, user: User): Promise<unknown> {
     const { itemId, amount } = createOfferDto;
 
     const wish = await this.wishesService.findById(itemId);
@@ -28,14 +28,14 @@ export class OffersService {
       throw new NotFoundException('Предложение не найдено');
     }
 
-    if (wish.owner.id === user.id) {
+    if ((wish as any).owner.id === user.id) {
       throw new BadRequestException(
         'Вы не можете заплатить за свое собственное желание',
       );
     }
 
-    const currentRaised = Number(wish.raised);
-    const price = Number(wish.price);
+    const currentRaised = Number((wish as any).raised);
+    const price = Number((wish as any).price);
     const offerAmount = Number(amount);
     const totalRaised = Number((currentRaised + offerAmount).toFixed(2));
 
@@ -56,7 +56,7 @@ export class OffersService {
       const offer = await offerRepo.save({
         ...createOfferDto,
         user,
-        item: wish,
+        item: wish as any,
       });
 
       await wishRepo.update(itemId, { raised: totalRaised });
@@ -71,7 +71,7 @@ export class OffersService {
     }
   }
 
-  async getOffer(id: number): Promise<any> {
+  async getOffer(id: number): Promise<unknown> {
     const offer = await this.offerRepository.findOne({
       where: { id },
       relations: ['user', 'item'],
@@ -84,7 +84,7 @@ export class OffersService {
     return offer.toJSON();
   }
 
-  async getOffers(): Promise<any> {
+  async getOffers(): Promise<unknown[]> {
     const offers = await this.offerRepository.find({
       relations: ['item', 'user'],
     });

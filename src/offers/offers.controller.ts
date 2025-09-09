@@ -25,17 +25,20 @@ export class OffersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createOfferDto: CreateOfferDto, @GetUser() user: User): Promise<any> {
+  create(
+    @Body() createOfferDto: CreateOfferDto,
+    @GetUser() user: User,
+  ): Promise<unknown> {
     return this.offersService.create(createOfferDto, user);
   }
 
   @Get()
-  getOffers(): Promise<any> {
+  getOffers(): Promise<unknown[]> {
     return this.offersService.getOffers();
   }
 
   @Get(':id')
-  getOffer(@Param('id', ParseIntPipe) id: number): Promise<any> {
+  getOffer(@Param('id', ParseIntPipe) id: number): Promise<unknown> {
     return this.offersService.getOffer(id);
   }
 }

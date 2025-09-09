@@ -32,7 +32,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return { message: exception.message, status };
     }
     return {
-      message: 'Ошибка сервера. Пожалуйста, повторите попытку позже или свяжитесь с нами',
+      message:
+        'Ошибка сервера. Пожалуйста, повторите попытку позже или свяжитесь с нами',
       status,
     };
   }

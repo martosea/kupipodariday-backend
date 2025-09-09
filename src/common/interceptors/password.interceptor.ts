@@ -4,21 +4,23 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 @Injectable()
 export class PasswordInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler) {
-    return next.handle().pipe(map((data) => this.removePasswordField(data)));
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    return next
+      .handle()
+      .pipe(map((data: unknown) => this.removePasswordField(data)));
   }
 
-  private removePasswordField(data: any) {
+  private removePasswordField(data: unknown): unknown {
     const seen = new WeakSet();
 
-    const isPlainObject = (val: any) =>
+    const isPlainObject = (val: unknown): val is Record<string, unknown> =>
       Object.prototype.toString.call(val) === '[object Object]';
 
-    const walk = (val: any): any => {
+    const walk = (val: unknown): unknown => {
       if (Array.isArray(val)) {
         return val.map((item) => walk(item));
       }
@@ -26,7 +28,7 @@ export class PasswordInterceptor implements NestInterceptor {
         if (seen.has(val)) return val;
         seen.add(val);
         const entries = Object.entries(val).filter(([k]) => k !== 'password');
-        const out: any = {};
+        const out: Record<string, unknown> = {};
         for (const [k, v] of entries) {
           out[k] = walk(v);
         }
